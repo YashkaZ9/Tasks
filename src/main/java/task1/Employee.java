@@ -1,4 +1,6 @@
-package Task1;
+package task1;
+
+import java.math.BigDecimal;
 
 public class Employee {
     private Long id;
@@ -6,13 +8,11 @@ public class Employee {
     private String lastName;
     private String email;
     private String gender;
-    private Double salary;
-    private String department;
-
-    public Employee() {}
+    private BigDecimal salary;
+    private Company.Department department;
 
     public Employee(Long id, String firstName, String lastName, String email,
-                    String gender, Double salary, String department) {
+                    String gender, BigDecimal salary, Company.Department department) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -62,20 +62,40 @@ public class Employee {
         this.gender = gender;
     }
 
-    public Double getSalary() {
+    public BigDecimal getSalary() {
         return salary;
     }
 
-    public void setSalary(Double salary) {
+    public void setSalary(BigDecimal salary) {
         this.salary = salary;
     }
 
-    public String getDepartment() {
+    public Company.Department getDepartment() {
         return department;
     }
 
-    public void setDepartment(String department) {
+    public void setDepartment(Company.Department department) {
         this.department = department;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Employee)) return false;
+
+        Employee employee = (Employee) o;
+
+        if (!getFirstName().equals(employee.getFirstName())) return false;
+        if (!getLastName().equals(employee.getLastName())) return false;
+        return !getEmail().equals(employee.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getFirstName().hashCode();
+        result = 31 * result + getLastName().hashCode();
+        result = 31 * result + getEmail().hashCode();
+        return result;
     }
 
     @Override
@@ -87,7 +107,7 @@ public class Employee {
                 ", email='" + email + '\'' +
                 ", gender='" + gender + '\'' +
                 ", salary=" + salary +
-                ", department='" + department + '\'' +
+                ", department='" + department.getName() + '\'' +
                 '}';
     }
 }

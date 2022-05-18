@@ -1,26 +1,26 @@
-id	firstName	lastName	salary	from_department	to_department
-11	Mikel	Wiggall	$45536.1	Research and Development	Training
-11	Mikel	Wiggall	$45536.1	Research and Development	Services
-11	Mikel	Wiggall	$45536.1	Research and Development	Marketing
-3	Izzy	Blenkinsop	$40802.25	Services	Training
-17	Hardy	Bonar	$46626.26	Engineering	Training
-17	Hardy	Bonar	$46626.26	Engineering	Services
-17	Hardy	Bonar	$46626.26	Engineering	Marketing
-100	Sanson	Lefort	$46579.99	Sales	Training
-100	Sanson	Lefort	$46579.99	Sales	Services
-100	Sanson	Lefort	$46579.99	Sales	Marketing
-86	Sula	Cowperthwaite	$43254.05	Accounting	Training
-99	Magda	Crawley	$49245.32	Business Development	Training
-99	Magda	Crawley	$49245.32	Business Development	Services
-99	Magda	Crawley	$49245.32	Business Development	Engineering
-99	Magda	Crawley	$49245.32	Business Development	Support
-99	Magda	Crawley	$49245.32	Business Development	Marketing
-13	Cody	MacKeever	$42302.58	Human Resources	Training
-28	Davidde	Gillings	$49956.67	Human Resources	Training
-28	Davidde	Gillings	$49956.67	Human Resources	Services
-28	Davidde	Gillings	$49956.67	Human Resources	Engineering
-28	Davidde	Gillings	$49956.67	Human Resources	Support
-28	Davidde	Gillings	$49956.67	Human Resources	Business Development
-28	Davidde	Gillings	$49956.67	Human Resources	Marketing
-62	Jedediah	Tingle	$39775.27	Human Resources	Training
-82	Dorella	Lathan	$44606.97	Human Resources	Training
+from_department;from_dep_avg_salary;to_department;to_dep_avg_salary;firstName;lastName;salary
+Research and Development;55051,51;Training;39770,42;Mikel;Wiggall;45536.10
+Research and Development;55051,51;Services;45301,10;Mikel;Wiggall;45536.10
+Research and Development;55051,51;Marketing;45330,43;Mikel;Wiggall;45536.10
+Services;45301,10;Training;39770,42;Izzy;Blenkinsop;40802.25
+Engineering;47586,46;Training;39770,42;Hardy;Bonar;46626.26
+Engineering;47586,46;Services;45301,10;Hardy;Bonar;46626.26
+Engineering;47586,46;Marketing;45330,43;Hardy;Bonar;46626.26
+Sales;61759,94;Training;39770,42;Sanson;Lefort;46579.99
+Sales;61759,94;Services;45301,10;Sanson;Lefort;46579.99
+Sales;61759,94;Marketing;45330,43;Sanson;Lefort;46579.99
+Accounting;52353,18;Training;39770,42;Sula;Cowperthwaite;43254.05
+Business Development;49586,15;Training;39770,42;Magda;Crawley;49245.32
+Business Development;49586,15;Services;45301,10;Magda;Crawley;49245.32
+Business Development;49586,15;Engineering;47586,46;Magda;Crawley;49245.32
+Business Development;49586,15;Support;48659,18;Magda;Crawley;49245.32
+Business Development;49586,15;Marketing;45330,43;Magda;Crawley;49245.32
+Human Resources;52012,52;Training;39770,42;Dorella;Lathan;44606.97
+Human Resources;52012,52;Training;39770,42;Davidde;Gillings;49956.67
+Human Resources;52012,52;Services;45301,10;Davidde;Gillings;49956.67
+Human Resources;52012,52;Engineering;47586,46;Davidde;Gillings;49956.67
+Human Resources;52012,52;Support;48659,18;Davidde;Gillings;49956.67
+Human Resources;52012,52;Business Development;49586,15;Davidde;Gillings;49956.67
+Human Resources;52012,52;Marketing;45330,43;Davidde;Gillings;49956.67
+Human Resources;52012,52;Training;39770,42;Jedediah;Tingle;39775.27
+Human Resources;52012,52;Training;39770,42;Cody;MacKeever;42302.58
