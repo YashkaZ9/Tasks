@@ -9,5 +9,8 @@
         <module name="Tasks" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Tasks" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

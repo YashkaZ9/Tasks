@@ -61,13 +61,14 @@ public class Company {
     }
 
     private void hireEmployees(String inputFileName) {
+        final Integer INPUT_FILE_HEADER_LENGTH = 7;
         try (BufferedReader br = new BufferedReader(new FileReader(inputFileName))) {
             Long id;
             BigDecimal salary;
             br.readLine();
             while (br.ready()) {
                 String[] employeeData = br.readLine().split(";");
-                if (employeeData.length != 7) {
+                if (employeeData.length != INPUT_FILE_HEADER_LENGTH) {
                     continue;
                 }
                 try {
