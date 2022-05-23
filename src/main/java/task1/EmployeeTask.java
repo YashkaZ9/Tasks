@@ -7,8 +7,10 @@ public class EmployeeTask {
                     "Их должно быть два: [inputFileName] [outputFileName].");
             return;
         }
-        Company company = new Company("Т1 Консалтинг", args[0]);
-        company.printEmployees();
-        company.printOptimizingEmployeesTransfers(args[1]);
+        Company company = new Company("Т1 Консалтинг");
+        company.hireEmployees(args[0]);
+//        company.printEmployees();
+//        company.findOptimizingEmployeesTransfers(args[1]);
+        company.findOptimizingGroupEmployeesTransfers(args[1]);
     }
 }

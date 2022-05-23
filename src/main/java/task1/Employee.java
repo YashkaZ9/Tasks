@@ -100,14 +100,6 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", gender='" + gender + '\'' +
-                ", salary=" + salary +
-                ", department='" + department.getName() + '\'' +
-                '}';
+        return firstName + " " + lastName;
     }
 }
