@@ -10,9 +10,9 @@ public class Company {
     private final String EMPLOYEES_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
             ";to_department;to_dep_avg_salary;firstName;lastName;salary";
     private final Integer EMPLOYEES_FILE_HEADER_LENGTH = 7;
-
     private final String GROUPS_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
             ";to_department;to_dep_avg_salary;employees;group_avg_salary";
+
     private String name;
     private Map<String, Department> departments;
 
@@ -31,7 +31,9 @@ public class Company {
             return name;
         }
 
-        public String getCompanyName() {return companyName;}
+        public String getCompanyName() {
+            return companyName;
+        }
 
         public BigDecimal getDepartmentAverageSalary() {
             BigDecimal totalSum = BigDecimal.ZERO;
@@ -59,6 +61,7 @@ public class Company {
         public int hashCode() {
             return getName().hashCode();
         }
+
         @Override
         public String toString() {
             return name;
@@ -135,7 +138,7 @@ public class Company {
                 for (Employee employee : companyDepartment.employees) {
                     for (Department department : departments.values()) {
                         if (!employee.getDepartment().equals(department)
-                            && employee.getSalary().compareTo(departmentsAverageSalaries.get(employee.getDepartment())) < 0
+                                && employee.getSalary().compareTo(departmentsAverageSalaries.get(employee.getDepartment())) < 0
                                 && employee.getSalary().compareTo(departmentsAverageSalaries.get(department)) > 0) {
                             bw.write(String.format("\n%s;%.2f;%s;%.2f;%s;%s;%s",
                                     employee.getDepartment().getName(),
@@ -165,19 +168,18 @@ public class Company {
                             new ArrayList<>(), BigDecimal.ZERO, employeeDepartment, department);
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Файл для записи не найден или поврежден.");
         }
     }
 
     private void findOptimizingGroupEmployeesTransfersByDepartment(BufferedWriter bw,
-                                                       HashMap<Department, BigDecimal> departmentsAverageSalaries,
-                                                       int seenEmployeeIdx,
-                                                       List<Employee> curGroup,
-                                                       BigDecimal curGroupSum,
-                                                       Department curDepartment,
-                                                       Department toDepartment) throws IOException {
+                                                                   HashMap<Department, BigDecimal> departmentsAverageSalaries,
+                                                                   int seenEmployeeIdx,
+                                                                   List<Employee> curGroup,
+                                                                   BigDecimal curGroupSum,
+                                                                   Department curDepartment,
+                                                                   Department toDepartment) throws IOException {
         BigDecimal curGroupAvg = BigDecimal.ZERO;
         if (curGroup.size() != 0) {
             curGroupAvg = curGroupSum.divide(BigDecimal.valueOf(curGroup.size()), 2, RoundingMode.HALF_UP);
@@ -203,10 +205,10 @@ public class Company {
         }
     }
 
-        public void printEmployees() {
+    public void printEmployees() {
         departments.forEach((name, department) -> {
             System.out.printf("%s: %.2f\n", name, department.getDepartmentAverageSalary());
-            department.employees.forEach(employee ->  System.out.printf("%-15s %-10s %13.2f\n",
+            department.employees.forEach(employee -> System.out.printf("%-15s %-10s %13.2f\n",
                     employee.getLastName(), employee.getFirstName(), employee.getSalary()));
         });
     }
