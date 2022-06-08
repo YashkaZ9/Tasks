@@ -1,0 +1,199 @@
+﻿1. Выведите список всех стран и количество городов в них.
+
+select country.name as country_name, count(city) as city_count from city
+full join country on city.id_country = country.id
+group by country.name;
+
+2. Получите список женских имен, встречающихся чаще 3-х раз.
+
+select person.name from person
+where person.sex = 'F'
+group by person.name
+having count(person.name) > 3;
+
+3. Выведите список разведенных мужчин и одиноких женщин, проживающих в городе Lonzee.
+
+select person.* from person
+inner join city on person.id_city = city.id
+where city.name = 'Lonzee'
+and (person.sex = 'M' and person.status = 'Divorced'
+or person.sex = 'F' and person.status = 'Single');
+
+4. Выведите список стран, в которых количество разведенных мужчин превышает количество одиноких женщин.
+
+select country.name from country
+inner join city on city.id_country = country.id
+inner join person on person.id_city = city.id
+group by country.name
+having sum(case when person.sex = 'M' and person.status = 'Divorced' then 1 else 0 end)
+	 > sum(case when person.sex = 'F' and person.status = 'Single' then 1 else 0 end);
+
+5. Выведите посылки, отправленные в мае 2020 года из Франции в Бельгию.
+
+select parcel.* from parcel
+inner join person p1 on p1.id = parcel.id_person_from
+inner join city ct1 on ct1.id = p1.id_city
+inner join country cn1 on cn1.id = ct1.id_country
+inner join person p2 on p2.id = parcel.id_person_to
+inner join city ct2 on ct2.id = p2.id_city
+inner join country cn2 on cn2.id = ct2.id_country
+where date_part('year', parcel.departure_date) = 2020
+and date_part('month', parcel.departure_date) = 5
+and cn1.name = 'France'
+and cn2.name = 'Belgium';
+
+ИЛИ
+
+select * from parcel
+where (select extract(year from parcel.departure_date)) = 2020
+and (select extract(month from parcel.departure_date)) = 5
+and (select country.name from country, city, person
+	 where country.id = city.id_country
+	 and city.id = person.id_city
+	 and person.id = parcel.id_person_from) = 'France'
+and (select country.name from country, city, person
+	 where country.id = city.id_country
+	 and city.id = person.id_city
+	 and person.id = parcel.id_person_to) = 'Belgium';
+
+6. Выведите список посылок, находящихся в процессе доставки 1 января 2019 года.
+
+select * from parcel
+where parcel.departure_date <= '2019-01-01 23:59:59'
+and parcel.departure_date + parcel.delivery_time * interval '1 hour' > '2019-01-01 23:59:59';
+
+ИЛИ
+
+select * from parcel
+where parcel.departure_date <= '2019-01-01 23:59:59'
+and parcel.departure_date + (concat(parcel.delivery_time, ' hours'))::interval > '2019-01-01 23:59:59';
+
+7. Найдите человека, которому была отправлена самая тяжелая посылка.
+
+select person.* from person, parcel
+where parcel.id_person_to = person.id
+and parcel.weight = (select max(parcel.weight) from parcel);
+
+8. Определите количество людей, у которых в адресе указан абонентский ящик (P.O. Box).
+
+select count(*) from person
+where person.address like '%P.O. Box%';
+
+9. Выведите таблицу с данными о суммарном весе международных пересылок с разбивкой по месяцам.
+
+select to_char(parcel.departure_date, 'Mon') as month, sum(parcel.weight) as total_weight from parcel
+inner join person p1 on p1.id = parcel.id_person_from
+inner join city c1 on c1.id = p1.id_city
+inner join person p2 on p2.id = parcel.id_person_to
+inner join city c2 on c2.id = p2.id_city
+where c1.id_country != c2.id_country
+group by month;
+
+10. Выведите список людей, которые никогда не получали посылки.
+
+select * from person
+where person.id not in (select parcel.id_person_to from parcel);
+
+11. Выведите список людей, проживающих во Франции, которые получали посылки, но сами никогда их не отправляли.
+
+select person.* from person
+inner join city on city.id = person.id_city
+inner join country on country.id = city.id_country
+where country.name = 'France'
+and person.id in (select parcel.id_person_to from parcel)
+and person.id not in (select parcel.id_person_from from parcel);
+
+12. Выведите 10 первых значений функции факториал (1, 2, 6, 24, 120 и т.д.).
+    Предполагается, что функции Postgres, вычисляющие факториал, использоваться не должны.
+
+with recursive f(i, factorial) as (
+	values (2, 1)
+	union all
+	select i + 1, i * factorial from f
+)
+
+select factorial from f limit 10;
+
+13. Две посылки объединяются в цепочку, если вторая посылка отправлена в тот же день,
+    когда получена первая посылка и страна отправления второй посылки совпадает со страной
+    прибытия первой посылки. Все посылки в цепочке должны быть международными.
+    Напишите запрос, который находит самые длинные цепочки (по количеству объединенных посылок)
+    и выводит их в виде последовательного объединения кодов посылок (например 1157 - 2195 - 2989).
+
+with recursive chains(id_parcel, id_country_to, arrival_date, chain) as (
+	select prcl1.id as id_parcel,
+		c2.id_country as id_country_to,
+		prcl1.departure_date + prcl1.delivery_time * interval '1 hour' as arrival_date,
+		array_append(array[]::varchar(10)[], prcl1.id::varchar(10)) as chain
+	from parcel prcl1
+		inner join person p1 on p1.id = prcl1.id_person_from
+		inner join city c1 on c1.id = p1.id_city
+		inner join person p2 on p2.id = prcl1.id_person_to
+		inner join city c2 on c2.id = p2.id_city
+	where
+		c1.id_country != c2.id_country
+	union
+	select prcl2.id,
+		c2.id_country,
+		prcl2.departure_date + prcl2.delivery_time * interval '1 hour',
+		array_append(chains.chain, prcl2.id::varchar(10))
+	from parcel prcl2
+		inner join person p1 on p1.id = prcl2.id_person_from
+		inner join city c1 on c1.id = p1.id_city
+		inner join chains on chains.id_country_to = c1.id_country
+		inner join person p2 on p2.id = prcl2.id_person_to
+		inner join city c2 on c2.id = p2.id_city
+	where
+		prcl2.id != chains.id_parcel
+		and c1.id_country != c2.id_country
+		and chains.arrival_date::date = prcl2.departure_date::date
+)
+
+select array_to_string(chain, ' - ') as chains from chains
+where cardinality(chain) = (select max(cardinality(chain)) from chains);
+
+ПРОВЕРКА (пример)
+
+create or replace function parcel_info(id int)
+returns table(id_parcel int, from_country varchar(100), to_country varchar(100),
+			departure_date timestamp, arrival_date timestamp)
+as $$
+	select prcl.id,
+		cn1.name as from_country,
+		cn2.name as to_country,
+		departure_date,
+		departure_date + delivery_time * interval '1 hour' as arrival_date
+	from parcel prcl
+		inner join person p1 on p1.id = prcl.id_person_from
+		inner join city ct1 on ct1.id = p1.id_city
+		inner join country cn1 on cn1.id = ct1.id_country
+		inner join person p2 on p2.id = prcl.id_person_to
+		inner join city ct2 on ct2.id = p2.id_city
+		inner join country cn2 on cn2.id = ct2.id_country
+	where prcl.id = parcel_info.id;
+$$ language sql;
+
+select * from parcel_info(293)
+union
+select * from parcel_info(1001)
+union
+select * from parcel_info(3388)
+union
+select * from parcel_info(228)
+order by departure_date;
+
+14. Добавьте в таблицу parcel столбец для хранения округленного веса и напишите запрос,
+    сохраняющий в этот столбец округленный вес посылки.
+    Вес посылок до 1 кг должен округляться до 100 грамм, 1 - 10 кг до 250 грамм, свыше 10 кг до 500 грамм.
+
+alter table parcel
+add column if not exists rounded_weight numeric;
+
+update parcel set rounded_weight = case
+	when parcel.weight < 1000
+	then round(parcel.weight::numeric / 100, 0) * 100
+	when 1000 <= parcel.weight and parcel.weight <= 10000
+	then round(parcel.weight::numeric / 250, 0) * 250
+	when parcel.weight > 10000
+	then round(parcel.weight::numeric / 500, 0) * 500
+end;

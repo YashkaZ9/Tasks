@@ -5,9 +5,9 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 public class IntersectionTask {
-    public static final String ARRAYLISTS_INTERSECTION_FILENAME = "intersections/arrayListsIntersection.txt";
-    public static final String SORTED_LINKEDLISTS_INTERSECTION_FILENAME = "intersections/linkedListsIntersection.txt";
-    public static final String HASHMAPS_INTERSECTION_FILENAME = "intersections/hashMapsIntersection.txt";
+    public static final String ARRAYLISTS_INTERSECTION_FILENAME = "output/intersections/arrayListsIntersection.txt";
+    public static final String SORTED_LINKEDLISTS_INTERSECTION_FILENAME = "output/intersections/linkedListsIntersection.txt";
+    public static final String HASHMAPS_INTERSECTION_FILENAME = "output/intersections/hashMapsIntersection.txt";
 
     public static void main(String[] args) {
         if (args.length < 2) {
