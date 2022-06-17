@@ -1,7 +1,5 @@
 package task3;
 
-import java.util.concurrent.Exchanger;
-
 public class PurchaseTask {
     public static void main(String[] args) {
         if (args.length != 1) {
