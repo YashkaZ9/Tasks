@@ -20,8 +20,8 @@ public class IntersectionTask {
         benchmark(Intersection::findArrayListsIntersectionPar, d1, d2);
         LinkedList<Node> sl1 = IntersectionData.putDataIntoSortedLinkedList(d1);
         LinkedList<Node> sl2 = IntersectionData.putDataIntoSortedLinkedList(d2);
-        benchmark(Intersection::findSortedLinkedListsIntersection, sl1, sl2);
-//        benchmark(Intersection::findSortedLinkedListsIntersectionWithCache, sl1, sl2);
+//        benchmark(Intersection::findSortedLinkedListsIntersection, sl1, sl2);
+        benchmark(Intersection::findSortedLinkedListsIntersectionWithCache, sl1, sl2);
         HashMap<Integer, List<String>> m1 = IntersectionData.putDataIntoHashMap(d1);
         HashMap<Integer, List<String>> m2 = IntersectionData.putDataIntoHashMap(d2);
         benchmark(Intersection::findHashMapsIntersection, m1, m2);

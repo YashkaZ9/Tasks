@@ -1,41 +1,41 @@
 package task3;
 
 import java.util.Random;
+import java.util.concurrent.Phaser;
 
 public class Customer extends Thread {
     private final Warehouse warehouse;
-    private final int maxProductsCount;
-    private final Random random;
-    private int purchasesCount;
-    private int productsCount;
+    private final Phaser purchasesLimiter;
+    private final Random choice;
+    private long purchasesCount;
+    private long productsCount;
 
-    public Customer(Warehouse warehouse, int customersCount) {
+    public Customer(Warehouse warehouse, Phaser purchasesLimiter) {
         this.warehouse = warehouse;
-        this.maxProductsCount = (int)Math.ceil(1.0 * warehouse.getInitialProductsCount() / customersCount);
-        this.random = new Random();
+        this.purchasesLimiter = purchasesLimiter;
+        this.purchasesLimiter.register();
+        this.choice = new Random();
         this.purchasesCount = 0;
         this.productsCount = 0;
     }
 
+    public void buyProducts() {
+        synchronized (warehouse) {
+            long desirableProductsCount = 1 + choice.nextInt(10);
+            long buyingProductsCount = warehouse.sellProducts(desirableProductsCount);
+            productsCount += buyingProductsCount;
+            purchasesCount += buyingProductsCount > 0 ? 1 : 0;
+        }
+    }
+
     @Override
     public void run() {
-        synchronized (warehouse) {
-            while (warehouse.getProductsCount() > 0) {
-                int productsToBuyCount = Math.min(warehouse.getProductsCount(), 1 + random.nextInt(10));
-                if (productsCount + productsToBuyCount <= maxProductsCount) {
-                    warehouse.buyProducts(productsToBuyCount);
-                    purchasesCount++;
-                    productsCount += productsToBuyCount;
-                }
-                try {
-                    warehouse.notifyAll();
-                    warehouse.wait(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            System.out.printf("%s: куплено товаров - %d, совершено покупок - %d\n",
-                    getName(), productsCount, purchasesCount);
+        while (warehouse.isOpen()) {
+            buyProducts();
+            purchasesLimiter.arriveAndAwaitAdvance();
         }
+        System.out.printf("%s: совершено покупок - %d, куплено товаров - %d\n",
+                getName(), purchasesCount, productsCount);
+        purchasesLimiter.arriveAndDeregister();
     }
 }

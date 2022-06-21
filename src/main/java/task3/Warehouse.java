@@ -1,18 +1,24 @@
 package task3;
 
 public class Warehouse {
-    private final int initialProductsCount = 1000;
-    private int productsCount = initialProductsCount;
+    private final long initialProductsCount = 1000;
+    private long productsCount = initialProductsCount;
 
-    public int getProductsCount() {
-        return productsCount;
-    }
-
-    public int getInitialProductsCount() {
+    public long getInitialProductsCount() {
         return initialProductsCount;
     }
 
-    public void buyProducts(int productsCount) {
-        this.productsCount -= productsCount;
+    public long getProductsCount() {
+        return productsCount;
+    }
+
+    public boolean isOpen() {
+        return productsCount > 0;
+    }
+
+    public long sellProducts(long desirableProductsCount) {
+        long productsToBeSold = Math.min(productsCount, desirableProductsCount);
+        this.productsCount -= productsToBeSold;
+        return productsToBeSold;
     }
 }

@@ -1,5 +1,7 @@
 package task3;
 
+import java.util.concurrent.Phaser;
+
 public class PurchaseTask {
     public static void main(String[] args) {
         if (args.length != 1) {
@@ -13,8 +15,9 @@ public class PurchaseTask {
             System.out.println("Передан параметр неверного типа.");
         }
         Warehouse warehouse = new Warehouse();
+        Phaser purchasesLimiter = new Phaser();
         for (int i = 0; i < customersCount; ++i) {
-            new Customer(warehouse, customersCount).start();
+            new Customer(warehouse, purchasesLimiter).start();
         }
     }
 }

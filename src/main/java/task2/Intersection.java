@@ -74,55 +74,44 @@ public class Intersection {
         }
     }
 
-//    //O(n)
-//    public static void findSortedLinkedListsIntersectionWithCache(LinkedList<Node> sl1, LinkedList<Node> sl2) {
-//        if (sl1.isEmpty() || sl2.isEmpty()) return;
-//        try (BufferedWriter bw = new BufferedWriter(new FileWriter(SORTED_LINKEDLISTS_INTERSECTION_FILENAME))) {
-//            if (sl1.size() == 1 && sl2.size() == 1 && sl1.get(0).getId() == sl2.get(0).getId()) {
-//                bw.write(String.format("%d,%s,%s\n", sl1.get(0).getId(), sl1.get(0).getValue(), sl2.get(0).getValue()));
-//                return;
-//            }
-//            ListIterator<Node> iterA = sl1.listIterator();
-//            ListIterator<Node> iterB = sl2.listIterator();
-//            List<String> bValuesCache = new LinkedList<>();
-//            int prevAVal = -1;
-//            Node a = iterA.next();
-//            Node b = iterB.next();
-//            while (iterA.hasNext() || iterB.hasNext()) {
-//                while (a.getId() < b.getId()) {
-//                    if (iterA.hasNext()) {
-//                        a = iterA.next();
-//                    } else break;
-//                }
-//                while (b.getId() < a.getId()) {
-//                    if (iterB.hasNext()) {
-//                        b = iterB.next();
-//                    } else break;
-//                }
-//                if (a.getId() != prevAVal) {
-//                    prevAVal = a.getId();
-//                    bValuesCache = new LinkedList<>();
-//                    while (a.getId() == b.getId()) {
-//                        bValuesCache.add(b.getValue());
-//                        if (iterB.hasNext()) {
-//                            b = iterB.next();
-//                        } else break;
-//                    }
-//                }
-//                while (a.getId() == prevAVal) {
-//                    for (String bValue : bValuesCache) {
-//                        bw.write(String.format("%d,%s,%s\n", a.getId(), a.getValue(), bValue));
-//                    }
-//                    if (iterA.hasNext()) {
-//                        prevAVal = a.getId();
-//                        a = iterA.next();
-//                    } else break;
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.out.println("В методе findSortedLinkedListsIntersectionWithCache произошла ошибка записи в файл.");
-//        }
-//    }
+    //O(n)
+    public static void findSortedLinkedListsIntersectionWithCache(LinkedList<Node> sl1, LinkedList<Node> sl2) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(SORTED_LINKEDLISTS_INTERSECTION_FILENAME))) {
+            ListIterator<Node> iterA = sl1.listIterator();
+            ListIterator<Node> iterB = sl2.listIterator();
+            List<String> bValuesCache = new LinkedList<>();
+            int prevAId = -1;
+            while (iterA.hasNext() && iterB.hasNext()) {
+                Node a = iterA.next();
+                Node b = iterB.next();
+                if (a.getId() < b.getId()) {
+                    iterB.previous();
+                    continue;
+                }
+                if (b.getId() < a.getId()) {
+                    iterA.previous();
+                    continue;
+                }
+                if (a.getId() != prevAId) {
+                    bValuesCache = new LinkedList<>();
+                    while (a.getId() == b.getId()) {
+                        bValuesCache.add(b.getValue());
+                        if (iterB.hasNext()) {
+                            b = iterB.next();
+                        } else break;
+                    }
+                }
+                iterB.previous();
+                if (iterB.hasPrevious()) iterB.previous();
+                for (String bValue : bValuesCache) {
+                    bw.write(String.format("%d,%s,%s\n", a.getId(), a.getValue(), bValue));
+                }
+                prevAId = a.getId();
+            }
+        } catch (IOException e) {
+            System.out.println("В методе findSortedLinkedListsIntersectionWithCache произошла ошибка записи в файл.");
+        }
+    }
 
     //O(n)
     public static void findHashMapsIntersection(Map<Integer, List<String>> m1, Map<Integer, List<String>> m2) {
