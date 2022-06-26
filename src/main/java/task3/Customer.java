@@ -20,12 +20,10 @@ public class Customer extends Thread {
     }
 
     public void buyProducts() {
-        synchronized (warehouse) {
-            long desirableProductsCount = 1 + choice.nextInt(10);
-            long buyingProductsCount = warehouse.sellProducts(desirableProductsCount);
-            productsCount += buyingProductsCount;
-            purchasesCount += buyingProductsCount > 0 ? 1 : 0;
-        }
+        long desirableProductsCount = 1 + choice.nextInt(10);
+        long buyingProductsCount = warehouse.sellProducts(desirableProductsCount);
+        productsCount += buyingProductsCount;
+        purchasesCount += buyingProductsCount > 0 ? 1 : 0;
     }
 
     @Override

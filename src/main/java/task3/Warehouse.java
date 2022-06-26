@@ -16,7 +16,7 @@ public class Warehouse {
         return productsCount > 0;
     }
 
-    public long sellProducts(long desirableProductsCount) {
+    public synchronized long sellProducts(long desirableProductsCount) {
         long productsToBeSold = Math.min(productsCount, desirableProductsCount);
         this.productsCount -= productsToBeSold;
         return productsToBeSold;
