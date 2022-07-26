@@ -19,10 +19,31 @@ public class Company {
     private String name;
     private Map<String, Department> departments;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Map<String, Department> getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(Map<String, Department> departments) {
+        this.departments = departments;
+    }
+
     public class Department {
+        private int id;
         private String name;
         private String companyName;
         private List<Employee> employees;
+
+        public List<Employee> getEmployees() {
+            return employees;
+        }
 
         private Department(String name) {
             this.name = name;
@@ -36,6 +57,14 @@ public class Company {
 
         public String getCompanyName() {
             return companyName;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
         }
 
         public BigDecimal getDepartmentAverageSalary() {
@@ -77,14 +106,10 @@ public class Company {
         departments = new HashMap<>();
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void hireEmployees(String inputFileName) {
         try (BufferedReader br = new BufferedReader(new FileReader(inputFileName))) {
-            Long id;
-            Long employeesNumber = 1L;
+            long id;
+            long employeesNumber = 1;
             BigDecimal salary;
             br.readLine();
             while (br.ready()) {

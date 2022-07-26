@@ -1,81 +1,49 @@
 package task1;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Collection;
 
 public class JdbcTask {
     private static final String URL = "jdbc:postgresql://localhost:5432/company";
     private static final String USERNAME = "user";
     private static final String PASSWORD = "123";
-    private static Connection connection;
 
-    static {
+    public static void saveEmployees(Collection<Company.Department> departments) {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
             System.out.println("Драйвер СУБД PostgreSQL не найден.");
         }
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException e) {
-            System.out.println("Не удалось установить соединение с БД.");
-        }
-    }
-
-    public static void saveEmployees(String inputFileName) {
-        try (BufferedReader br = new BufferedReader(new FileReader(inputFileName))) {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO employee VALUES (?, ?, ?, ?, ?, ?, ?)");
-            long employeesNumber = 1;
-            long id;
-            BigDecimal salary;
-            br.readLine();
+        try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            while (br.ready()) {
-                String[] employeeData = br.readLine().split(";");
-                employeesNumber++;
-                if (employeeData.length != Company.EMPLOYEES_FILE_HEADER_LENGTH) {
-                    System.out.printf("Работник в строке %d пропущен. Его данные некорректны.\n", employeesNumber);
-                    continue;
+            PreparedStatement departmentAddPreparedStatement = connection.prepareStatement("INSERT INTO department(name) VALUES (?)");
+            PreparedStatement departmentGetPreparedStatement = connection.prepareStatement("SELECT MAX(id) FROM department WHERE name = ?");
+            PreparedStatement employeePreparedStatement = connection.prepareStatement(
+                    "INSERT INTO employee(first_name, last_name, gender, email, salary, department_id) VALUES (?, ?, ?, ?, ?, ?)");
+            for (Company.Department department : departments) {
+                departmentAddPreparedStatement.setString(1, department.getName());
+                departmentAddPreparedStatement.executeUpdate();
+                departmentGetPreparedStatement.setString(1, department.getName());
+                ResultSet resultSet = departmentGetPreparedStatement.executeQuery();
+                resultSet.next();
+                department.setId(resultSet.getInt(1));
+                connection.commit();
+                for (Employee employee : department.getEmployees()) {
+                    employeePreparedStatement.setString(1, employee.getFirstName());
+                    employeePreparedStatement.setString(2, employee.getLastName());
+                    employeePreparedStatement.setString(3, employee.getGender());
+                    employeePreparedStatement.setString(4, employee.getEmail());
+                    employeePreparedStatement.setBigDecimal(5, employee.getSalary());
+                    employeePreparedStatement.setInt(6, department.getId());
+                    employeePreparedStatement.executeUpdate();
                 }
-                try {
-                    id = Long.parseLong(employeeData[0]);
-                    salary = new BigDecimal(employeeData[5]);
-                    if (salary.compareTo(BigDecimal.ZERO) < 0) {
-                        System.out.printf("Работник в строке %d пропущен. Данные о его зарплате некорректны.\n", employeesNumber);
-                        continue;
-                    }
-                } catch (NumberFormatException ex) {
-                    System.out.printf("Работник в строке %d пропущен. Его данные некорректны.\n", employeesNumber);
-                    continue;
-                }
-                preparedStatement.setLong(1, id);
-                preparedStatement.setString(2, employeeData[1]);
-                preparedStatement.setString(3, employeeData[2]);
-                preparedStatement.setString(4, employeeData[3]);
-                preparedStatement.setString(5, employeeData[4]);
-                preparedStatement.setBigDecimal(6, salary);
-                preparedStatement.setString(7, employeeData[6]);
-                preparedStatement.executeUpdate();
+//                Проверка транзакционности
+//                Thread.sleep(5000);
+                connection.commit();
             }
-            connection.commit();
-        } catch (FileNotFoundException ex) {
-            System.out.printf("Файл '%s' не найден.\n", inputFileName);
         } catch (SQLException e) {
-            System.out.println("При сохранении данных в БД возникла ошибка. Внесенные данные не будут сохранены.");
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                System.out.println("При отмене транзакции возникла ошибка.");
-            }
-        } catch (Exception e) {
-            System.out.println("Ошибка чтения данных.");
+            System.out.println("При сохранении данных в БД возникла ошибка.");
         }
     }
 
@@ -84,6 +52,9 @@ public class JdbcTask {
             System.out.println("Неверное количество параметров. Должен быть указан файл с данными.");
             return;
         }
-        saveEmployees(args[0]);
+        Company company = new Company("Т1 Консалтинг");
+        company.hireEmployees(args[0]);
+        Collection<Company.Department> departments = company.getDepartments().values();
+        saveEmployees(departments);
     }
 }
