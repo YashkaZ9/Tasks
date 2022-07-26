@@ -11,6 +11,6 @@ public class EmployeeTask {
         company.hireEmployees(args[0]);
 //        company.printEmployees();
 //        company.findOptimizingEmployeesTransfers(args[1]);
-        company.findOptimizingGroupEmployeesTransfers(args[1]);
+//        company.findOptimizingGroupEmployeesTransfers(args[1]);
     }
 }

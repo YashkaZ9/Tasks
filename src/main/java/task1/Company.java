@@ -2,15 +2,18 @@ package task1;
 
 import java.io.*;
 import java.lang.reflect.Array;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Company {
-    private final String EMPLOYEES_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
+    public static final String EMPLOYEES_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
             ";to_department;to_dep_avg_salary;firstName;lastName;salary";
-    private final Integer EMPLOYEES_FILE_HEADER_LENGTH = 7;
-    private final String GROUPS_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
+    public static final Integer EMPLOYEES_FILE_HEADER_LENGTH = 7;
+    public static final String GROUPS_TRANSFERS_FILE_HEADER = "from_department;from_dep_avg_salary" +
             ";to_department;to_dep_avg_salary;employees;group_avg_salary";
 
     private String name;
