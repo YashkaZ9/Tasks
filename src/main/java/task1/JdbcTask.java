@@ -17,30 +17,32 @@ public class JdbcTask {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             connection.setAutoCommit(false);
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
-            PreparedStatement departmentAddPreparedStatement = connection.prepareStatement("INSERT INTO department(name) VALUES (?)");
-            PreparedStatement departmentGetPreparedStatement = connection.prepareStatement("SELECT MAX(id) FROM department WHERE name = ?");
+            PreparedStatement departmentPreparedStatement = connection.prepareStatement(
+                    "INSERT INTO departments(name) VALUES (?)",
+                    Statement.RETURN_GENERATED_KEYS
+            );
             PreparedStatement employeePreparedStatement = connection.prepareStatement(
-                    "INSERT INTO employee(first_name, last_name, gender, email, salary, department_id) VALUES (?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO employees(first_name, last_name, gender, email, salary, department_id) VALUES (?, ?, ?, ?, ?, ?)"
+            );
             for (Company.Department department : departments) {
-                departmentAddPreparedStatement.setString(1, department.getName());
-                departmentAddPreparedStatement.executeUpdate();
-                departmentGetPreparedStatement.setString(1, department.getName());
-                ResultSet resultSet = departmentGetPreparedStatement.executeQuery();
-                resultSet.next();
-                department.setId(resultSet.getInt(1));
-                connection.commit();
-                for (Employee employee : department.getEmployees()) {
-                    employeePreparedStatement.setString(1, employee.getFirstName());
-                    employeePreparedStatement.setString(2, employee.getLastName());
-                    employeePreparedStatement.setString(3, employee.getGender());
-                    employeePreparedStatement.setString(4, employee.getEmail());
-                    employeePreparedStatement.setBigDecimal(5, employee.getSalary());
-                    employeePreparedStatement.setInt(6, department.getId());
-                    employeePreparedStatement.executeUpdate();
+                departmentPreparedStatement.setString(1, department.getName());
+                departmentPreparedStatement.executeUpdate();
+                ResultSet resultSet = departmentPreparedStatement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    department.setId(resultSet.getInt(1));
+                    for (Employee employee : department.getEmployees()) {
+                        employeePreparedStatement.setString(1, employee.getFirstName());
+                        employeePreparedStatement.setString(2, employee.getLastName());
+                        employeePreparedStatement.setString(3, employee.getGender());
+                        employeePreparedStatement.setString(4, employee.getEmail());
+                        employeePreparedStatement.setBigDecimal(5, employee.getSalary());
+                        employeePreparedStatement.setInt(6, department.getId());
+                        employeePreparedStatement.executeUpdate();
+                    }
+//                    Проверка транзакционности
+//                    Thread.sleep(5000);
+                    connection.commit();
                 }
-//                Проверка транзакционности
-//                Thread.sleep(5000);
-                connection.commit();
             }
         } catch (SQLException e) {
             System.out.println("При сохранении данных в БД возникла ошибка.");
